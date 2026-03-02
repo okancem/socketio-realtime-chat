@@ -63,6 +63,7 @@ This project was built as a hands-on practice to deepen understanding of real-ti
 
 ## Future Improvements
 
+* Some bugs will be fixed
 * JWT Authentication
 * Private messaging
 * Message persistence with MongoDB
