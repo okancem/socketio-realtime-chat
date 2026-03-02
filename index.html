@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.io Test Project 6</title>
+</head>
+<body>
+    <h1>Online Chat</h1>
+
+    <input type="text" id="username" placeholder="Your Username">
+
+    <br><br>
+
+    <label for="room-name">Room Name:</label>
+    <input type="text" id="room-name">
+    <button onclick="joinRoom()">Join Room</button>
+    <button onclick="leaveRoom()">Leave Room</button>
+
+    <br><br>
+
+    <h2 id="room-title"></h2>
+
+    <div id="messages" style="border:1px solid black; height:200px; width: 30%; overflow:auto;"></div>
+
+    <br><br>
+
+    <label for="message">Enter your message:</label>
+    <input type="text" id="message">
+
+    <br><br>
+
+    <button onclick="sendMessage()">Send Message</button>
+
+    <br><br>
+
+    <button onclick="seeRooms()">See Rooms</button>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        const socket = io("http://localhost:3000");
+        
+        joinRoom = () => {
+            const username = document.getElementById("username").value;
+            const roomName = document.getElementById("room-name").value;
+
+            if (!username) {
+                alert("Enter your username!");
+                return;
+            }
+
+            if (!roomName) {
+                alert("Enter a valid room name!");
+                return;
+            }
+
+            socket.emit("join-room", {username, roomName});
+
+            document.getElementById("room-title").textContent = roomName;
+        }
+
+        leaveRoom = () => {
+            const username = document.getElementById("username").value;
+            const roomName = document.getElementById("room-name").value;
+            const messageDiv = document.getElementById("messages");
+
+            if (!roomName) {
+                alert("You are not in a room!");
+                return;
+            }
+
+            socket.emit("leave-room", {username, roomName});
+
+            document.getElementById("room-name").value = "";
+            messageDiv.textContent = "";
+
+            document.getElementById("room-title").textContent = "";
+        }
+
+        sendMessage = () => {
+            const username = document.getElementById("username").value;
+            const roomName = document.getElementById("room-name").value;
+            const message = document.getElementById("message").value;
+
+            if (!username) {
+                alert("Enter your username!");
+                return;
+            }
+
+            if (!roomName) {
+                alert("You are not in any room!");
+                return;
+            }
+
+            if (!message) {
+                alert("Enter a message!");
+                return;
+            }
+
+            socket.emit("send-message", {username, message, roomName});
+
+            document.getElementById("message").value = "";
+        }
+
+        seeRooms = () => {
+            socket.emit("see-rooms")
+        }
+
+        socket.on("receive-message", (data) => {
+            const messageDiv = document.getElementById("messages");
+
+            const newMessage = document.createElement("p");
+            newMessage.textContent = `[${data.username}]: ${data.message}`;
+            
+            messageDiv.appendChild(newMessage);
+        });
+    </script>
+</body>
+</html>
